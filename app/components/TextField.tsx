@@ -175,7 +175,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     >
       {!!(label || labelTx) && (
         <Text
-          preset="formLabel"
+          preset="bold"
           text={label}
           tx={labelTx}
           txOptions={labelTxOptions}
@@ -203,6 +203,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           {...TextInputProps}
           editable={!disabled}
           style={$inputStyles}
+          returnKeyType="done"
         />
 
         {!!RightAccessory && (
@@ -236,10 +237,10 @@ const $labelStyle: TextStyle = {
 const $inputWrapperStyle: ViewStyle = {
   flexDirection: "row",
   alignItems: "flex-start",
-  borderWidth: 1,
+  borderBottomWidth: 1,
   borderRadius: 4,
-  backgroundColor: colors.palette.neutral200,
-  borderColor: colors.palette.neutral400,
+  backgroundColor: colors.palette.neutral100,
+  borderBottomColor: colors.palette.primary500,
   overflow: "hidden",
 }
 
