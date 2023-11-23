@@ -7,16 +7,15 @@
  */
 import { ApiResponse, ApisauceInstance, create } from "apisauce"
 import Config from "../../config"
-import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem"
+import { getGeneralApiProblem } from "./apiProblem"
 import type { ApiConfig, ApiFeedResponse } from "./api.types"
-import type { EpisodeSnapshotIn } from "../../models/Episode"
 
 /**
  * Configuring the apisauce instance.
  */
 export const DEFAULT_API_CONFIG: ApiConfig = {
   url: Config.API_URL,
-  timeout: 10000,
+  timeout: 7000000,
 }
 
 /**
@@ -39,41 +38,58 @@ export class Api {
         Accept: "application/json",
       },
     })
-  }
 
-  /**
-   * Gets a list of recent React Native Radio episodes.
-   */
-  async getEpisodes(): Promise<{ kind: "ok"; episodes: EpisodeSnapshotIn[] } | GeneralApiProblem> {
-    // make the api call
-    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get(
-      `api.json?rss_url=https%3A%2F%2Ffeeds.simplecast.com%2FhEI_f9Dx`,
-    )
-
-    // the typical ways to die when calling an api
-    if (!response.ok) {
-      const problem = getGeneralApiProblem(response)
-      if (problem) return problem
-    }
-
-    // transform the data into the format we are expecting
-    try {
-      const rawData = response.data
-
-      // This is where we transform the data into the shape we expect for our MST model.
-      const episodes: EpisodeSnapshotIn[] =
-        rawData?.items.map((raw) => ({
-          ...raw,
-        })) ?? []
-
-      return { kind: "ok", episodes }
-    } catch (e) {
-      if (__DEV__ && e instanceof Error) {
-        console.tron.error?.(`Bad data: ${e.message}\n${response.data}`, e.stack)
+    this.apisauce.addResponseTransform((response: ApiResponse<ApiFeedResponse>) => {
+      if (!response.ok) {
+        const problem = getGeneralApiProblem(response)
+        if (problem) return Promise.reject(problem)
       }
-      return { kind: "bad-data" }
-    }
+
+      // Additional transformations can be added here
+
+      return response
+    })
   }
+
+  private request = async <T>(
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
+    url: string,
+    data?: any,
+    headers?: any,
+  ): Promise<T> => {
+    const response = await this.apisauce.any({
+      method,
+      url,
+      data,
+      headers,
+    })
+
+    console.log("response", response.data)
+
+    if (!response.ok) {
+      console.error(`Error calling ${method} ${url}`, response.problem)
+      const problem = getGeneralApiProblem(response)
+      console.log("PROBLEM", problem)
+      if (problem) throw problem
+    }
+
+    return response.data as T
+  }
+
+  get = <T>(url: string, data?: any, headers?: any): Promise<T> =>
+    this.request<T>("GET", url, headers)
+
+  post = <T>(url: string, data?: any, headers?: any): Promise<T> =>
+    this.request<T>("POST", url, data, headers)
+
+  put = <T>(url: string, data?: any, headers?: any): Promise<T> =>
+    this.request<T>("PUT", url, data, headers)
+
+  patch = <T>(url: string, data?: any, headers?: any): Promise<T> =>
+    this.request<T>("PATCH", url, data, headers)
+
+  delete = <T>(url: string, data?: any, headers?: any): Promise<T> =>
+    this.request<T>("DELETE", url, data, headers)
 }
 
 // Singleton instance of the API for convenience

@@ -16,19 +16,19 @@ export type GeneralApiProblem =
   /**
    * We're not allowed because we haven't identified ourself. This is 401.
    */
-  | { kind: "unauthorized" }
+  | { kind: "unauthorized"; message: string }
   /**
    * We don't have access to perform that request. This is 403.
    */
-  | { kind: "forbidden" }
+  | { kind: "forbidden"; message: string }
   /**
    * Unable to find that resource.  This is a 404.
    */
-  | { kind: "not-found" }
+  | { kind: "not-found"; message: string }
   /**
    * All other 4xx series errors.
    */
-  | { kind: "rejected" }
+  | { kind: "rejected"; message: string }
   /**
    * Something truly unexpected happened. Most likely can try again. This is a catch all.
    */
@@ -58,13 +58,13 @@ export function getGeneralApiProblem(response: ApiResponse<any>): GeneralApiProb
     case "CLIENT_ERROR":
       switch (response.status) {
         case 401:
-          return { kind: "unauthorized" }
+          return { kind: "unauthorized", message: response.data.message }
         case 403:
-          return { kind: "forbidden" }
+          return { kind: "forbidden", message: response.data.message }
         case 404:
-          return { kind: "not-found" }
+          return { kind: "not-found", message: response.data.message }
         default:
-          return { kind: "rejected" }
+          return { kind: "rejected", message: response.data.message }
       }
     case "CANCEL_ERROR":
       return null
