@@ -1,53 +1,57 @@
-import { observer } from "mobx-react-lite"
-import React, { ComponentType, FC, useEffect, useMemo, useRef, useState } from "react"
-import { TextInput, TextStyle, ViewStyle } from "react-native"
-import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
-import { useStores } from "../models"
+import React, { ComponentType, FC, useMemo, useRef, useState } from "react"
+import { Alert, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import {
+  Button,
+  Divider,
+  Icon,
+  Screen,
+  Text,
+  TextField,
+  TextFieldAccessoryProps,
+} from "../components"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
+import { useAuthStore } from "app/models"
+import { columnRight, flex, rowCenterSpaceBetween } from "app/theme/globalStyles"
+import { useForm, Controller } from "react-hook-form"
+import * as z from "zod"
+import { LoginSchema } from "app/validations/auth"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
-export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
+export const LoginScreen: FC<LoginScreenProps> = function LoginScreen(_props) {
+  const { navigation } = _props
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "abdizamedmo@gmail.com",
+      password: "123456",
+    },
+  })
+
   const authPasswordInput = useRef<TextInput>(null)
 
-  const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [attemptsCount, setAttemptsCount] = useState(0)
-  const {
-    authenticationStore: { authEmail, setAuthEmail, setAuthToken, validationError },
-  } = useStores()
 
-  useEffect(() => {
-    // Here is where you could fetch credentials from keychain or storage
-    // and pre-fill the form fields.
-    setAuthEmail("ignite@infinite.red")
-    setAuthPassword("ign1teIsAwes0m3")
+  const { login, status, setStatus } = useAuthStore()
 
-    // Return a "cleanup" function that React will run when the component unmounts
-    return () => {
-      setAuthPassword("")
-      setAuthEmail("")
-    }
-  }, [])
+  function handleSignIn(data: z.infer<typeof LoginSchema>) {
+    login(data.email, data.password)
+      .then()
+      .catch((err) => {
+        setStatus("fail")
 
-  const error = isSubmitted ? validationError : ""
+        const error = err
 
-  function login() {
-    setIsSubmitted(true)
-    setAttemptsCount(attemptsCount + 1)
-
-    if (validationError) return
-
-    // Make a request to your server to get an authentication token.
-    // If successful, reset the fields and set the token.
-    setIsSubmitted(false)
-    setAuthPassword("")
-    setAuthEmail("")
-
-    // We'll mock this with a fake token.
-    setAuthToken(String(Date.now()))
+        if (Object.prototype.hasOwnProperty.call(error, "message")) {
+          Alert.alert("Error", error.message)
+        }
+      })
   }
 
   const PasswordRightAccessory: ComponentType<TextFieldAccessoryProps> = useMemo(
@@ -56,7 +60,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
         return (
           <Icon
             icon={isAuthPasswordHidden ? "view" : "hidden"}
-            color={colors.palette.neutral800}
+            color={colors.palette.primary500}
             containerStyle={props.style}
             size={20}
             onPress={() => setIsAuthPasswordHidden(!isAuthPasswordHidden)}
@@ -70,56 +74,100 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     <Screen
       preset="auto"
       contentContainerStyle={$screenContentContainer}
-      safeAreaEdges={["top", "bottom"]}
+      safeAreaEdges={["bottom"]}
     >
       <Text testID="login-heading" tx="loginScreen.signIn" preset="heading" style={$signIn} />
-      <Text tx="loginScreen.enterDetails" preset="subheading" style={$enterDetails} />
-      {attemptsCount > 2 && <Text tx="loginScreen.hint" size="sm" weight="light" style={$hint} />}
+      <Text tx="loginScreen.enterDetails" preset="default" style={$enterDetails} />
 
-      <TextField
-        value={authEmail}
-        onChangeText={setAuthEmail}
-        containerStyle={$textField}
-        autoCapitalize="none"
-        autoComplete="email"
-        autoCorrect={false}
-        keyboardType="email-address"
-        labelTx="loginScreen.emailFieldLabel"
-        placeholderTx="loginScreen.emailFieldPlaceholder"
-        helper={error}
-        status={error ? "error" : undefined}
-        onSubmitEditing={() => authPasswordInput.current?.focus()}
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextField
+            onBlur={onBlur}
+            onChangeText={(value) => onChange(value)}
+            value={value}
+            containerStyle={$textField}
+            autoCapitalize="none"
+            autoComplete="email"
+            autoCorrect={false}
+            keyboardType="email-address"
+            labelTx="loginScreen.emailFieldLabel"
+            placeholderTx="loginScreen.emailFieldPlaceholder"
+            helper={errors.email?.message}
+            status={errors.email?.message ? "error" : undefined}
+            onSubmitEditing={() => authPasswordInput.current?.focus()}
+          />
+        )}
+        name="email"
+        rules={{ required: true }}
       />
 
-      <TextField
-        ref={authPasswordInput}
-        value={authPassword}
-        onChangeText={setAuthPassword}
-        containerStyle={$textField}
-        autoCapitalize="none"
-        autoComplete="password"
-        autoCorrect={false}
-        secureTextEntry={isAuthPasswordHidden}
-        labelTx="loginScreen.passwordFieldLabel"
-        placeholderTx="loginScreen.passwordFieldPlaceholder"
-        onSubmitEditing={login}
-        RightAccessory={PasswordRightAccessory}
+      <Controller
+        control={control}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <TextField
+            onBlur={onBlur}
+            onChangeText={(value) => onChange(value)}
+            value={value}
+            containerStyle={$textField}
+            autoCapitalize="none"
+            autoComplete="password"
+            autoCorrect={false}
+            secureTextEntry={isAuthPasswordHidden}
+            labelTx="loginScreen.passwordFieldLabel"
+            placeholderTx="loginScreen.passwordFieldPlaceholder"
+            onSubmitEditing={handleSubmit(handleSignIn)}
+            RightAccessory={PasswordRightAccessory}
+            helper={errors.password?.message}
+            status={errors.password?.message ? "error" : undefined}
+          />
+        )}
+        name="password"
+        rules={{ required: true }}
       />
 
-      <Button
-        testID="login-button"
-        tx="loginScreen.tapToSignIn"
-        style={$tapButton}
-        preset="reversed"
-        onPress={login}
-      />
+      <View
+        style={[
+          rowCenterSpaceBetween,
+          {
+            marginTop: spacing.xl,
+          },
+        ]}
+      >
+        <Button
+          testID="register-button"
+          text="Create an Account"
+          preset="text"
+          onPress={() => navigation.navigate("Register")}
+        />
+        <Button
+          testID="forgot-password-button"
+          text="Forgot Password?"
+          preset="text"
+          onPress={() => navigation.navigate("ForgotPassword")}
+        />
+      </View>
+
+      <View style={[flex, columnRight]}>
+        <Divider />
+        <Button
+          loading={status === "pending"}
+          testID="login-button"
+          tx="loginScreen.tapToSignIn"
+          style={$tapButton}
+          preset="reversed"
+          onPress={handleSubmit(handleSignIn)}
+        />
+      </View>
     </Screen>
   )
-})
+}
 
 const $screenContentContainer: ViewStyle = {
-  paddingVertical: spacing.xxl,
+  paddingTop: spacing.xl,
+  paddingBottom: spacing.lg,
   paddingHorizontal: spacing.lg,
+  flex: 1,
 }
 
 const $signIn: TextStyle = {
@@ -128,11 +176,6 @@ const $signIn: TextStyle = {
 
 const $enterDetails: TextStyle = {
   marginBottom: spacing.lg,
-}
-
-const $hint: TextStyle = {
-  color: colors.tint,
-  marginBottom: spacing.md,
 }
 
 const $textField: ViewStyle = {
