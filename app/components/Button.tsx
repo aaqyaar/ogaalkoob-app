@@ -6,6 +6,7 @@ import {
   StyleProp,
   TextStyle,
   ViewStyle,
+  ActivityIndicator,
 } from "react-native"
 import { colors, spacing, typography } from "../theme"
 import { Text, TextProps } from "./Text"
@@ -65,6 +66,8 @@ export interface ButtonProps extends PressableProps {
    * Children components.
    */
   children?: React.ReactNode
+
+  loading?: boolean
 }
 
 /**
@@ -85,6 +88,7 @@ export function Button(props: ButtonProps) {
     children,
     RightAccessory,
     LeftAccessory,
+    loading = false,
     ...rest
   } = props
 
@@ -93,6 +97,7 @@ export function Button(props: ButtonProps) {
     return [
       $viewPresets[preset],
       $viewStyleOverride,
+      loading && { opacity: 0.5 },
       !!pressed && [$pressedViewPresets[preset], $pressedViewStyleOverride],
     ]
   }
@@ -105,14 +110,28 @@ export function Button(props: ButtonProps) {
   }
 
   return (
-    <Pressable style={$viewStyle} accessibilityRole="button" {...rest}>
+    <Pressable style={$viewStyle} disabled={loading} accessibilityRole="button" {...rest}>
       {(state) => (
         <>
           {!!LeftAccessory && <LeftAccessory style={$leftAccessoryStyle} pressableState={state} />}
 
-          <Text tx={tx} text={text} txOptions={txOptions} style={$textStyle(state)}>
-            {children}
-          </Text>
+          <>
+            {loading && <ActivityIndicator color={colors.palette.neutral100} />}
+
+            <Text
+              tx={tx}
+              text={text}
+              txOptions={txOptions}
+              style={[
+                $textStyle(state),
+                {
+                  marginLeft: spacing.sm,
+                },
+              ]}
+            >
+              {children}
+            </Text>
+          </>
 
           {!!RightAccessory && (
             <RightAccessory style={$rightAccessoryStyle} pressableState={state} />
@@ -124,14 +143,23 @@ export function Button(props: ButtonProps) {
 }
 
 const $baseViewStyle: ViewStyle = {
-  minHeight: 56,
-  borderRadius: 4,
+  minHeight: 60,
+  borderRadius: 99,
   justifyContent: "center",
   alignItems: "center",
   flexDirection: "row",
   paddingVertical: spacing.sm,
   paddingHorizontal: spacing.sm,
   overflow: "hidden",
+
+  shadowColor: "#000000",
+  shadowOffset: {
+    width: 0,
+    height: 0,
+  },
+  shadowOpacity: 9.5,
+  shadowRadius: 21,
+  elevation: 10,
 }
 
 const $baseTextStyle: TextStyle = {
@@ -153,15 +181,21 @@ const $viewPresets = {
     {
       borderWidth: 1,
       borderColor: colors.palette.neutral400,
-      backgroundColor: colors.palette.neutral100,
+      backgroundColor: colors.palette.primary500,
     },
   ] as StyleProp<ViewStyle>,
 
-  filled: [$baseViewStyle, { backgroundColor: colors.palette.neutral300 }] as StyleProp<ViewStyle>,
+  filled: [$baseViewStyle, { backgroundColor: colors.palette.primary500 }] as StyleProp<ViewStyle>,
 
   reversed: [
     $baseViewStyle,
-    { backgroundColor: colors.palette.neutral800 },
+    { backgroundColor: colors.palette.primary500 },
+  ] as StyleProp<ViewStyle>,
+
+  text: [
+    {
+      backgroundColor: "transparent",
+    },
   ] as StyleProp<ViewStyle>,
 }
 
@@ -169,16 +203,19 @@ const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
   default: $baseTextStyle,
   filled: $baseTextStyle,
   reversed: [$baseTextStyle, { color: colors.palette.neutral100 }],
+  text: [$baseTextStyle, { color: colors.palette.primary500 }],
 }
 
 const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
-  default: { backgroundColor: colors.palette.neutral200 },
-  filled: { backgroundColor: colors.palette.neutral400 },
-  reversed: { backgroundColor: colors.palette.neutral700 },
+  default: { backgroundColor: colors.palette.primary500 },
+  filled: { backgroundColor: colors.palette.primary500 },
+  reversed: { backgroundColor: colors.palette.primary500 },
+  text: { backgroundColor: "transparent" },
 }
 
 const $pressedTextPresets: Record<Presets, StyleProp<TextStyle>> = {
   default: { opacity: 0.9 },
   filled: { opacity: 0.9 },
   reversed: { opacity: 0.9 },
+  text: { opacity: 0.9 },
 }
