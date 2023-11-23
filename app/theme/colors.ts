@@ -15,7 +15,7 @@ const palette: Record<string, string> = {
   primary200: "#E8C1B4",
   primary300: "#DDA28E",
   primary400: "#D28468",
-  primary500: "#C76542",
+  primary500: "#F89300",
   primary600: "#A54F31",
 
   secondary100: "#DCDDE9",
@@ -59,11 +59,11 @@ export const colors = {
   /**
    * The default color of the screen background.
    */
-  background: palette.neutral200,
+  background: palette.neutral100,
   /**
    * The default border color.
    */
-  border: palette.neutral400,
+  border: palette.primary500,
   /**
    * The main tinting color.
    */
