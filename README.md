@@ -4,12 +4,12 @@ Ogaalkoob is an online e-book reader app that people can use to purchase and rea
 
 ## Tech Stack
 
-- [ ] React Native
-- [ ] TypeScript
-- [ ] Zustand
-- [ ] React Native MMKV
-- [ ] Next.js
-- [ ] REST API
+- [x] React Native
+- [x] TypeScript
+- [x] Zustand
+- [x] React Native MMKV
+- [x] Next.js
+- [x] REST API
 
 ## Getting Started
 
