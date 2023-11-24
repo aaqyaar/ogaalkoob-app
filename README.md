@@ -61,7 +61,7 @@ yarn android
 
 Generate a keystore file using the following command:
 
-````bash
+```bash
 sudo keytool -genkey -v -keystore ogaalkoob.keystore -alias ogaalkoob-app -keyalg RSA -keysize 2048 -validity 10000
 ```
 
@@ -74,7 +74,7 @@ MYAPP_UPLOAD_STORE_FILE=ogaalkoob.keystore
 MYAPP_UPLOAD_KEY_ALIAS=ogaalkoob-app
 MYAPP_UPLOAD_STORE_PASSWORD=aaqyaar@10
 MYAPP_UPLOAD_KEY_PASSWORD=aaqyaar@10
-````
+```
 
 Then open the `android/app/build.gradle` file and add the following lines:
 
