@@ -1,10 +1,10 @@
 {
-  "name": "mobile",
-  "displayName": "mobile",
+  "name": "Ogaalkoob",
+  "displayName": "Ogaalkoob",
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
-    "scheme": "mobile",
+    "name": "Ogaalkoob",
+    "slug": "Ogaalkoob",
+    "scheme": "ogaalkoob",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon-all.png",
@@ -20,7 +20,7 @@
     "assetBundlePatterns": ["**/*"],
     "android": {
       "icon": "./assets/images/app-icon-android-legacy.png",
-      "package": "com.mobile",
+      "package": "com.ogaalkoob.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
@@ -34,7 +34,7 @@
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
       "supportsTablet": true,
-      "bundleIdentifier": "com.mobile",
+      "bundleIdentifier": "com.ogaalkoob.app",
       "splash": {
         "image": "./assets/images/splash-logo-ios-mobile.png",
         "tabletImage": "./assets/images/splash-logo-ios-tablet.png",
