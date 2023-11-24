@@ -7,6 +7,7 @@ import { Icon } from "app/components"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { CompositeScreenProps } from "@react-navigation/native"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 export type TabNavigatorParamList = {
   Home: undefined
@@ -16,13 +17,40 @@ export type TabNavigatorParamList = {
 }
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>()
+const Stack = createNativeStackNavigator<AppStackParamList>()
 
 export type TabScreenProps<T extends keyof TabNavigatorParamList> = CompositeScreenProps<
   BottomTabScreenProps<TabNavigatorParamList, T>,
   AppStackScreenProps<keyof AppStackParamList>
 >
 
-export const TabNavigator = () => {
+export const HomeNavigator = function HomeNavigator() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="App" component={TabNavigator} />
+      <Stack.Screen
+        name="BookView"
+        options={{
+          headerShown: true,
+          headerBackTitle: "",
+          headerTintColor: colors.palette.primary500,
+          headerTitleStyle: {
+            color: colors.palette.neutral900,
+          },
+          // headerShadowVisible: false,
+          navigationBarColor: colors.background,
+        }}
+        component={Screens.BookViewScreen}
+      />
+    </Stack.Navigator>
+  )
+}
+
+const TabNavigator = () => {
   const { bottom } = useSafeAreaInsets()
 
   return (

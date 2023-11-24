@@ -19,7 +19,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
 import { useAuthStore } from "app/models"
 import { translate } from "app/i18n"
-import { TabNavigator, TabNavigatorParamList } from "./TabNavigator"
+import { HomeNavigator, TabNavigatorParamList } from "./TabNavigator"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -37,11 +37,16 @@ import { TabNavigator, TabNavigatorParamList } from "./TabNavigator"
 export type AppStackParamList = {
   Login: undefined
   App: NavigatorScreenParams<TabNavigatorParamList>
+  Home: undefined
+
   // 🔥 Your screens go here
   ForgotPassword: undefined
   VerifyCode: { email: string }
   ResetPassword: { userId: string }
   Register: undefined
+
+  //
+  BookView: { pdfUrl: string; bookName: string }
 }
 
 /**
@@ -73,25 +78,13 @@ const AppStack = function AppStack() {
         // headerShadowVisible: false,
         navigationBarColor: colors.background,
       }}
-      initialRouteName={isAuthenticated ? "App" : "Login"}
+      initialRouteName={isAuthenticated ? "Home" : "Login"}
     >
       {isAuthenticated ? (
         <>
-          {/* <Stack.Screen
-            name="Welcome"
-            component={Screens.WelcomeScreen}
-            options={{
-              headerShown: true,
-              headerLargeTitle: true,
-              headerTitle: "Hey there!",
-              headerSearchBarOptions: {
-                placeholder: "Search",
-              },
-            }}
-          /> */}
           <Stack.Screen
-            name="App"
-            component={TabNavigator}
+            name="Home"
+            component={HomeNavigator}
             options={{
               headerShown: false,
             }}
