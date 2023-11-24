@@ -15,6 +15,11 @@ try {
   // empty catch block
 }
 
+export const withPdf: ConfigPlugin = (config) => {
+  config = withAndroidPackagingOptions(config)
+  return config
+}
+
 export const withAndroidPackagingOptions: ConfigPlugin = (config) => {
   return withAppBuildGradle(config, (config) => {
     if (config.modResults.language === "groovy") {
