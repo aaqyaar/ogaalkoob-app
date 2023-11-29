@@ -19,7 +19,7 @@ if (__DEV__) {
 import "./i18n"
 import "./utils/ignoreWarnings"
 import { useFonts } from "expo-font"
-import React from "react"
+import React, { useEffect } from "react"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 import * as Linking from "expo-linking"
 import { AppNavigator, useNavigationPersistence } from "./navigators"
@@ -51,7 +51,6 @@ interface AppProps {
  * This is the root component of our app.
  */
 function App(props: AppProps) {
-  const { hideSplashScreen } = props
   const {
     initialNavigationState,
     onNavigationStateChange,
@@ -60,9 +59,19 @@ function App(props: AppProps) {
 
   const [areFontsLoaded] = useFonts(customFontsToLoad)
 
-  React.useEffect(() => {
-    setTimeout(hideSplashScreen, 500)
-  }, [hideSplashScreen])
+  // useAuthStore.persist.onHydrate(() => {
+  //   props.hideSplashScreen()
+  // })
+
+  useEffect(() => {
+    // Hide splash screen after 1.5s
+    setTimeout(() => {
+      props
+        .hideSplashScreen()
+        .then((data) => console.log(`SplashScreen.hideAsync() succeeded: ${data.toString()}`))
+        .catch(console.warn)
+    }, 1500)
+  }, [])
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
@@ -83,9 +92,9 @@ function App(props: AppProps) {
       <ErrorBoundary catchErrors={Config.catchErrors}>
         <GestureHandlerRootView style={$container}>
           <AppNavigator
-            linking={linking}
             initialState={initialNavigationState}
             onStateChange={onNavigationStateChange}
+            linking={linking}
           />
         </GestureHandlerRootView>
       </ErrorBoundary>

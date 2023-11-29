@@ -2,10 +2,10 @@ import App from "./app/app"
 import React from "react"
 import * as SplashScreen from "expo-splash-screen"
 
-// SplashScreen.preventAutoHideAsync()
+SplashScreen.preventAutoHideAsync()
 
-function IgniteApp() {
+function Index() {
   return <App hideSplashScreen={SplashScreen.hideAsync} />
 }
 
-export default IgniteApp
+export default Index
