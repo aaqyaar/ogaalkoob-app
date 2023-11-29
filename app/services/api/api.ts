@@ -8,7 +8,9 @@
 import { ApiResponse, ApisauceInstance, create } from "apisauce"
 import Config from "../../config"
 import { getGeneralApiProblem } from "./apiProblem"
-import type { ApiConfig, ApiFeedResponse } from "./api.types"
+import type { ApiConfig } from "./api.types"
+import { load, remove } from "app/utils/storage"
+import { AuthState } from "app/models"
 
 /**
  * Configuring the apisauce instance.
@@ -39,13 +41,17 @@ export class Api {
       },
     })
 
-    this.apisauce.addResponseTransform((response: ApiResponse<ApiFeedResponse>) => {
+    this.apisauce.addResponseTransform((response: ApiResponse<any>) => {
+      console.log("RESPONSE", response.data)
+
+      if (response.data.message === "jwt expired") {
+        remove("authStore")
+      }
+
       if (!response.ok) {
         const problem = getGeneralApiProblem(response)
         if (problem) return Promise.reject(problem)
       }
-
-      // Additional transformations can be added here
 
       return response
     })
@@ -57,14 +63,18 @@ export class Api {
     data?: any,
     headers?: any,
   ): Promise<T> => {
+    const authStore = load<AuthState>("authStore")
+    const token = authStore?.state.token
+
     const response = await this.apisauce.any({
       method,
       url,
       data,
-      headers,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...headers,
+      },
     })
-
-    console.log("response", response.data)
 
     if (!response.ok) {
       console.error(`Error calling ${method} ${url}`, response.problem)
