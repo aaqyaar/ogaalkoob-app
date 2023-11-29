@@ -11,6 +11,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 export type TabNavigatorParamList = {
   Home: undefined
+  Books: undefined
   Purchases: undefined
   Profile: undefined
   Cart: undefined
@@ -45,6 +46,21 @@ export const HomeNavigator = function HomeNavigator() {
           navigationBarColor: colors.background,
         }}
         component={Screens.BookViewScreen}
+      />
+
+      <Stack.Screen
+        name="Book"
+        options={{
+          headerShown: true,
+          headerBackTitle: "",
+          headerTintColor: colors.palette.primary500,
+          headerTitleStyle: {
+            color: colors.palette.neutral900,
+          },
+          // headerShadowVisible: false,
+          navigationBarColor: colors.background,
+        }}
+        component={Screens.BookScreen}
       />
     </Stack.Navigator>
   )
@@ -94,6 +110,18 @@ const TabNavigator = () => {
           tabBarLabelStyle: { fontFamily: typography.primary.normal },
           tabBarIcon: ({ color, focused }) => (
             <Icon svgIcon="home" color={focused ? colors.palette.primary500 : color} size={27} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Books"
+        component={Screens.BooksScreen}
+        options={{
+          headerTitleAlign: "center",
+          headerTitleStyle: { fontFamily: typography.primary.semiBold },
+          tabBarLabelStyle: { fontFamily: typography.primary.normal },
+          tabBarIcon: ({ color, focused }) => (
+            <Icon svgIcon="books" color={focused ? colors.palette.primary500 : color} size={27} />
           ),
         }}
       />
