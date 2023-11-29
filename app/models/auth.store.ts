@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { api } from "app/services/api"
 import { persist, createJSONStorage } from "zustand/middleware"
-import { zustandStorage } from "app/utils/storage/zustandStorage"
+import { zustandStorage } from "app/utils/storage/storage"
 import {
   IForgotPasswordResponse,
   ILoginResponse,
