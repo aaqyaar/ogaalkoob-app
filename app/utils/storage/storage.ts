@@ -1,4 +1,10 @@
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { MMKV } from "react-native-mmkv"
+import { StateStorage } from "zustand/middleware"
+import { RootState } from "app/models"
+
+const storage = new MMKV({
+  id: "root",
+})
 
 /**
  * Loads a string from storage.
@@ -7,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
  */
 export async function loadString(key: string): Promise<string | null> {
   try {
-    return await AsyncStorage.getItem(key)
+    return storage.getString(key) ?? null
   } catch {
     // not sure why this would fail... even reading the RN docs I'm unclear
     return null
@@ -22,7 +28,7 @@ export async function loadString(key: string): Promise<string | null> {
  */
 export async function saveString(key: string, value: string): Promise<boolean> {
   try {
-    await AsyncStorage.setItem(key, value)
+    storage.set(key, value)
     return true
   } catch {
     return false
@@ -34,10 +40,10 @@ export async function saveString(key: string, value: string): Promise<boolean> {
  *
  * @param key The key to fetch.
  */
-export async function load(key: string): Promise<unknown | null> {
+export function load<T>(key: string): RootState<T> | null {
   try {
-    const almostThere = await AsyncStorage.getItem(key)
-    return JSON.parse(almostThere ?? "")
+    const value = zustandStorage.getItem(key) as any
+    return (JSON.parse(value) as RootState<T>) ?? null
   } catch {
     return null
   }
@@ -51,7 +57,7 @@ export async function load(key: string): Promise<unknown | null> {
  */
 export async function save(key: string, value: unknown): Promise<boolean> {
   try {
-    await AsyncStorage.setItem(key, JSON.stringify(value))
+    storage.set(key, JSON.stringify(value))
     return true
   } catch {
     return false
@@ -59,21 +65,41 @@ export async function save(key: string, value: unknown): Promise<boolean> {
 }
 
 /**
- * Removes something from storage.
- *
- * @param key The key to kill.
+ * Removes an item from storage.
+ * @param key The key to remove.
+ * @returns
  */
-export async function remove(key: string): Promise<void> {
+export function remove(key: string): boolean {
   try {
-    await AsyncStorage.removeItem(key)
-  } catch {}
+    storage.delete(key)
+    return true
+  } catch {
+    return false
+  }
+}
+/**
+ * Clear all keys from storage.
+ * @returns
+ */
+export function clear(): boolean {
+  try {
+    storage.clearAll()
+    return true
+  } catch {
+    return false
+  }
 }
 
 /**
- * Burn it all to the ground.
+ * A zustand storage object that uses MMKV.
+ *
+ * @param key The key to fetch.
  */
-export async function clear(): Promise<void> {
-  try {
-    await AsyncStorage.clear()
-  } catch {}
+export const zustandStorage: StateStorage = {
+  getItem: (key) => {
+    const value = storage.getString(key)
+    return value ?? null
+  },
+  setItem: (key, value) => storage.set(key, value),
+  removeItem: (key) => storage.delete(key),
 }
