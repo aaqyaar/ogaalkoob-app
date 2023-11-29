@@ -157,9 +157,9 @@ const $baseViewStyle: ViewStyle = {
     width: 0,
     height: 0,
   },
-  shadowOpacity: 9.5,
-  shadowRadius: 21,
-  elevation: 10,
+  shadowOpacity: 3.5,
+  shadowRadius: 60,
+  elevation: 2.5,
 }
 
 const $baseTextStyle: TextStyle = {
