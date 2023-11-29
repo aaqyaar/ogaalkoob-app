@@ -1,5 +1,5 @@
 import React, { ComponentType, FC, useMemo, useRef, useState } from "react"
-import { Alert, TextInput, TextStyle, View, ViewStyle } from "react-native"
+import { Alert, Platform, TextInput, TextStyle, View, ViewStyle } from "react-native"
 import {
   Button,
   Divider,
@@ -77,8 +77,12 @@ export const RegisterScreen: FC<RegisterScreenProps> = function RegisterScreen(_
   return (
     <Screen
       preset="auto"
+      style={flex}
       contentContainerStyle={$screenContentContainer}
       safeAreaEdges={["bottom"]}
+      KeyboardAvoidingViewProps={{
+        behavior: Platform.OS === "ios" ? "padding" : "height",
+      }}
     >
       <Text
         testID="register-heading"
@@ -178,7 +182,7 @@ const $screenContentContainer: ViewStyle = {
   paddingTop: spacing.xl,
   paddingBottom: spacing.lg,
   paddingHorizontal: spacing.lg,
-  flex: 1,
+  flexGrow: 1,
 }
 
 const $container: ViewStyle = {

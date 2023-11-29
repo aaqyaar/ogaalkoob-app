@@ -1,47 +1,31 @@
-import React, { FC } from "react"
-import { View, SectionList, Image } from "react-native"
+import React, { FC, useCallback } from "react"
+import { View } from "react-native"
 import { TabScreenProps } from "app/navigators"
-import { Screen, Text, Button } from "app/components"
-import { flex } from "app/theme/globalStyles"
-import SoundPlayer from "react-native-sound-player"
-import { spacing } from "app/theme"
+import { BooksList, GenreList, Icon, Screen, Text } from "app/components"
+import { flex, rowCenterSpaceBetween } from "app/theme/globalStyles"
+import { colors, spacing } from "app/theme"
+import { useBookStore } from "app/models/book.store"
+import { useGenreStore } from "app/models/genre.store"
+import { useFocusEffect } from "@react-navigation/native"
 
 interface HomeScreenProps extends TabScreenProps<"Home"> {}
 
 export const HomeScreen: FC<HomeScreenProps> = function HomeScreen(_props) {
   // Pull in navigation via props
   const { navigation } = _props
+  const { fetchBooks, books, status } = useBookStore()
+  const { fetchGenres, genres, status: genreStatus } = useGenreStore()
 
-  // useHeader(
-  //   {
-  //     rightTx: "common.logOut",
-  //     onRightPress: logout,
-  //     RightActionComponent: (
-  //       <Icon
-  //         svgIcon={"search"}
-  //         size={20}
-  //         color="#000"
-  //         onPress={() => console.log("search")}
-  //         containerStyle={{ marginRight: spacing.sm }}
-  //       />
-  //     ),
-  //     leftText: "Ogaalkoob",
-  //   },
-
-  //   [logout],
-  // )
-
-  const playSound = () => {
-    try {
-      SoundPlayer.playUrl(
-        "https://pub-c49d4c6084bd4825a730310681ab39d5.r2.dev/rnr280-final-1700751504800.mp3",
-      )
-      // or play from url
-      // SoundPlayer.playUrl('https://example.com/music.mp3')
-    } catch (e) {
-      console.log(`cannot play the sound file`, e)
-    }
-  }
+  useFocusEffect(
+    useCallback(() => {
+      fetchBooks({
+        page: 1,
+        limit: 50,
+      })?.then(() => {
+        fetchGenres()
+      })
+    }, []),
+  )
 
   return (
     <Screen
@@ -51,51 +35,35 @@ export const HomeScreen: FC<HomeScreenProps> = function HomeScreen(_props) {
           paddingHorizontal: spacing.md,
         },
       ]}
-      preset="scroll"
+      preset="auto"
     >
       <View style={flex}>
-        <SectionList
-          sections={[
-            { title: "D", data: ["Devin", "Dan", "Dominic"] },
-            {
-              title: "J",
-              data: ["Jackson", "James", "Jillian", "Jimmy", "Joel", "John", "Julie"],
-            },
-          ]}
-          renderItem={({ item }) => <Text>{item}</Text>}
-          renderSectionHeader={({ section }) => <Text>{section.title}</Text>}
-          keyExtractor={(item, index) => index.toString()}
-        />
+        <BooksList status={status} books={books && books?.data.slice(0, 5)} align="horizontal" />
       </View>
 
-      <Image
-        source={{
-          uri: "https://pub-c49d4c6084bd4825a730310681ab39d5.r2.dev/Abdi-1700747471286.jpeg",
-        }}
-        width={100}
-        height={100}
-      />
+      <GenreList status={genreStatus} genres={genres} />
 
-      <Button
-        onPress={() => {
-          // navigation.navigate("Details", { name: "Jane" })
-          playSound()
+      <View
+        style={{
+          marginTop: spacing.md,
         }}
       >
-        Play
-      </Button>
+        <View style={rowCenterSpaceBetween}>
+          <Text preset="bold" size="lg">
+            Recommended Books
+          </Text>
 
-      <Button
-        onPress={() => {
-          navigation.navigate("BookView", {
-            pdfUrl:
-              "https://pub-c49d4c6084bd4825a730310681ab39d5.r2.dev/IJIEEB-V13-N5-5-1700753215560.pdf",
-            bookName: "Rich Dad Poor Dad",
-          })
-        }}
-      >
-        Read the book
-      </Button>
+          <Icon
+            svgIcon="arrowLeft"
+            size={30}
+            color={colors.tint}
+            onPress={() => navigation.navigate("Books")}
+          />
+        </View>
+        <View style={flex}>
+          <BooksList status={status} books={books && books.data.slice(5, 10)} align="horizontal" />
+        </View>
+      </View>
     </Screen>
   )
 }
