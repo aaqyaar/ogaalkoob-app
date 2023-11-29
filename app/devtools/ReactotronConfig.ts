@@ -7,7 +7,7 @@ import { Platform, NativeModules } from "react-native"
 
 import { ArgType } from "reactotron-core-client"
 import mmkvPlugin from "reactotron-react-native-mmkv"
-import { clear, storage } from "../utils/storage/zustandStorage"
+import { clear, storage } from "../utils/storage/storage"
 import { goBack, resetRoot, navigate } from "../navigators/navigationUtilities"
 import { Reactotron } from "./ReactotronClient"
 
