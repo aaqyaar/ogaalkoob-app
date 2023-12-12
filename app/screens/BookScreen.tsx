@@ -4,11 +4,15 @@ import { AppStackScreenProps } from "app/navigators"
 import { Button, Screen, SkeletonLoading, Text } from "app/components"
 import { useBookStore } from "app/models/book.store"
 import { colors, spacing } from "app/theme"
-import { flex, rowCenterSpaceBetween } from "app/theme/globalStyles"
+import { column, flex, rowCenterSpaceBetween } from "app/theme/globalStyles"
 import { $genreCard } from "app/components/Genre/styles"
 import { fDate } from "app/utils/formatDate"
 import { formatCurrency } from "app/utils/formatCurrency"
 import { Book } from "types"
+import { useCartStore } from "app/models/cart.store"
+import { Toast } from "toastify-react-native"
+import { useAuthStore } from "app/models"
+import { usePurchaseStore } from "app/models/purchase.store"
 
 interface BookScreenProps extends AppStackScreenProps<"Book"> {}
 
@@ -17,6 +21,16 @@ export const BookScreen: FC<BookScreenProps> = function BookScreen(_props) {
   const { navigation, route } = _props
 
   const { status, fetchBook } = useBookStore()
+  const { addItem, isInCart } = useCartStore()
+  const { profile } = useAuthStore()
+
+  const { isUserAlreadyPurchased } = usePurchaseStore()
+
+  const books = profile?.purchases
+    ? profile?.purchases?.map((purchase) => purchase.books).flat()
+    : []
+
+  const purchasedBook = books?.find((book) => book.id === route.params?.bookId)
 
   const [book, setBook] = React.useState<Book | null>(null)
 
@@ -35,7 +49,22 @@ export const BookScreen: FC<BookScreenProps> = function BookScreen(_props) {
         })
     }
   }, [route.params?.bookId])
-  console.log(book)
+
+  function handleAddToCart() {
+    if (book && !isInCart(book?.id as string)) {
+      addItem(book)
+      Toast.success("Added to cart")
+    }
+  }
+
+  const handleReadPDF = (bookName: string, bookUrl: string) => {
+    navigation.navigate("BookView", { bookName, pdfUrl: bookUrl })
+  }
+
+  const handlePlayAudio = (bookName: string, bookUrl: string, bookCover: string) => {
+    navigation.navigate("PlayAudio", { bookName, audioUrl: bookUrl, bookCover })
+  }
+
   return (
     <Screen style={$root} preset="scroll" safeAreaEdges={["bottom"]}>
       {status === "pending" ? (
@@ -51,7 +80,11 @@ export const BookScreen: FC<BookScreenProps> = function BookScreen(_props) {
               <View style={flex}>
                 {/* Image Section */}
                 <View style={$bookContainer}>
-                  <Image source={{ uri: book?.photos[0] || undefined }} style={$bookCover} />
+                  {book !== null ? (
+                    <Image source={{ uri: book?.photos[0] }} style={$bookCover} />
+                  ) : (
+                    <SkeletonLoading type="cover" />
+                  )}
                 </View>
               </View>
               <View style={[flex, { padding: spacing.md }]}>
@@ -120,14 +153,53 @@ export const BookScreen: FC<BookScreenProps> = function BookScreen(_props) {
                 </View>
               </View>
             </View>
-            <Button
-              preset="reversed"
-              style={{
-                marginTop: spacing.md,
-              }}
-            >
-              Buy Now for {formatCurrency(status === "done" ? (book?.price as number) : 0)}
-            </Button>
+            {isUserAlreadyPurchased(profile?.purchases, profile?.id, book?.id as string) ? (
+              <View
+                style={[
+                  flex,
+                  column,
+                  {
+                    gap: spacing.sm,
+                  },
+                ]}
+              >
+                <Button
+                  preset="reversed"
+                  onPress={() =>
+                    handleReadPDF(book?.title as string, purchasedBook?.pdfUrl as string)
+                  }
+                >
+                  Read The Book
+                </Button>
+
+                <Button
+                  preset="text"
+                  onPress={() =>
+                    handlePlayAudio(
+                      book?.title as string,
+                      purchasedBook?.audioUrl as string,
+                      purchasedBook?.photos[0] as string,
+                    )
+                  }
+                >
+                  or Play as Audio
+                </Button>
+              </View>
+            ) : (
+              <Button
+                preset={isInCart(book?.id as string) ? "filled" : "reversed"}
+                style={{
+                  marginTop: spacing.md,
+                }}
+                onPress={handleAddToCart}
+              >
+                {isInCart(book?.id as string)
+                  ? "Already in cart"
+                  : `Buy Now for ${formatCurrency(
+                      status === "done" ? (book?.price as number) : 0,
+                    )}`}
+              </Button>
+            )}
           </View>
           <Text weight="semiBold" size="lg">
             About the book
