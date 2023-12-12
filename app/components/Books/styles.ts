@@ -1,5 +1,5 @@
 import { spacing } from "app/theme"
-import { ImageStyle, TextStyle, ViewStyle } from "react-native"
+import { ImageStyle, Platform, TextStyle, ViewStyle } from "react-native"
 
 export const $booksContainer: ViewStyle = {
   marginTop: spacing.md,
@@ -15,10 +15,10 @@ export const $bookCard: ViewStyle = {
   backgroundColor: "#fff",
 }
 export const $bookCover: ImageStyle = {
-  width: 190,
+  width: Platform.OS === "ios" ? 190 : 180,
   height: 260,
   resizeMode: "cover",
-  borderRadius: 13.5,
+  borderRadius: 10,
 }
 
 export const $bookTitle: TextStyle = {
@@ -36,5 +36,5 @@ export const $bookAuthor: TextStyle = {
 
 export const $verticalList: ViewStyle = {
   paddingHorizontal: spacing.sm,
-  flexGrow: 1,
+  // flexGrow: 1,
 }

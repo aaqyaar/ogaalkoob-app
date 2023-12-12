@@ -1,5 +1,5 @@
 import React, { memo, useCallback } from "react"
-import { View, TouchableOpacity } from "react-native"
+import { View, TouchableOpacity, ActivityIndicator, ScrollView, RefreshControl } from "react-native"
 import { Image } from "@rneui/themed"
 import { SkeletonLoading, Text } from "app/components"
 import { rowCenterSpaceBetween } from "app/theme/globalStyles"
@@ -10,26 +10,20 @@ import { StoreStatus } from "app/models"
 import { Book } from "types"
 import { useNavigation } from "@react-navigation/native"
 import { AppStackScreenProps } from "app/navigators"
-import {
-  $bookAuthor,
-  $bookCard,
-  $bookCover,
-  $bookTitle,
-  $booksContainer,
-  $verticalList,
-} from "./styles"
-import { useBookStore } from "app/models/book.store"
+import { $bookAuthor, $bookCard, $bookCover, $bookTitle, $booksContainer } from "./styles"
+import { ViewStyle } from "react-native-phone-input"
 
-interface BooksListProps {
+interface BooksListProps<T> {
   books: Book[] | null
   status: StoreStatus
   align: "vertical" | "horizontal"
   canPullToRefresh?: boolean
+  onEndReached?: () => void
+  refreshFn?: () => Promise<T>
 }
 
-export const BooksList = memo(function BooksList(props: BooksListProps) {
-  const { books, status, align = "horizontal", canPullToRefresh = false } = props
-  const { fetchBooks } = useBookStore()
+export const BooksList = memo(function BooksList<T>(props: BooksListProps<T>) {
+  const { books, status, align = "horizontal", onEndReached, refreshFn } = props
   const [refreshing, setRefreshing] = React.useState(false)
 
   const { navigate } = useNavigation() as AppStackScreenProps<"Book">["navigation"]
@@ -41,6 +35,7 @@ export const BooksList = memo(function BooksList(props: BooksListProps) {
       </View>
     ) : (
       <View
+        key={item.id}
         style={{
           marginTop: spacing.md,
         }}
@@ -71,36 +66,60 @@ export const BooksList = memo(function BooksList(props: BooksListProps) {
     )
   }
 
+  const renderBooksInTwoColumns = () => {
+    return (
+      <View style={$rowWrapper}>
+        {books?.map((book) => {
+          return (
+            <View style={$width} key={book.id}>
+              {renderBookItem({ item: book })}
+            </View>
+          )
+        })}
+      </View>
+    )
+  }
+
   const numColumns = align === "vertical" ? 2 : 1
 
-  const handleRefresh = useCallback(() => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true)
-    fetchBooks({
-      page: 1,
-      limit: 50,
-    })
-      .then(() => {
-        setRefreshing(false)
-      })
-      .catch(() => {
-        setRefreshing(false)
-      })
-  }, [])
+    refreshFn &&
+      refreshFn()
+        .then(() => {
+          setRefreshing(false)
+        })
+        .catch(() => {
+          setRefreshing(false)
+        })
+  }, [refreshing])
 
-  return (
+  return align === "horizontal" ? (
     <FlashList
       data={books}
       estimatedItemSize={20}
       showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={align === "vertical"}
       keyExtractor={(item) => item.id}
       horizontal={align === "horizontal"}
       renderItem={renderBookItem}
       numColumns={numColumns}
-      onEndReached={() => console.log("end reached")}
-      refreshing={canPullToRefresh && refreshing}
-      onRefresh={() => canPullToRefresh && handleRefresh()}
-      contentContainerStyle={align === "vertical" ? ($verticalList as any) : null}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={() => {
+        return status === "pending" ? <ActivityIndicator /> : null
+      }}
     />
+  ) : (
+    <ScrollView
+      contentContainerStyle={{
+        paddingHorizontal: spacing.sm,
+      }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      onScroll={onEndReached}
+    >
+      {renderBooksInTwoColumns()}
+    </ScrollView>
   )
 })
+
+const $rowWrapper: ViewStyle = { flexDirection: "row", flexWrap: "wrap" }
+const $width: ViewStyle = { width: "50%" }
