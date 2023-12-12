@@ -77,7 +77,6 @@ export class Api {
     if (!response.ok) {
       console.error(`Error calling ${method} ${url}`, response.problem)
       const problem = getGeneralApiProblem(response)
-      console.log("PROBLEM", problem)
       if (problem) throw problem
     }
 
