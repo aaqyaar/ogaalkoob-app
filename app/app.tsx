@@ -29,6 +29,7 @@ import { customFontsToLoad } from "./theme"
 import Config from "./config"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { ViewStyle } from "react-native"
+import ToastManager from "toastify-react-native"
 
 export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 
@@ -95,6 +96,14 @@ function App(props: AppProps) {
             initialState={initialNavigationState}
             onStateChange={onNavigationStateChange}
             linking={linking}
+          />
+          <ToastManager
+            position={"bottom"}
+            animationIn={"zoomIn"}
+            animationOut={"zoomOutDown"}
+            // textStyle={{ fontSize: spacing.md }}
+            // width={250}
+            // height={60}
           />
         </GestureHandlerRootView>
       </ErrorBoundary>
