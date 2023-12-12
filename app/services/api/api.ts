@@ -42,8 +42,6 @@ export class Api {
     })
 
     this.apisauce.addResponseTransform((response: ApiResponse<any>) => {
-      console.log("RESPONSE", response.data)
-
       if (response.data.message === "jwt expired") {
         remove("authStore")
       }
