@@ -8,6 +8,7 @@ import { StoreStatus } from "."
 interface BookStore {
   books: BaseResponse<Book> | null
   status: StoreStatus
+
   setStatus: (status: StoreStatus) => void
   fetchBooks: (params: {
     page?: number
@@ -19,9 +20,10 @@ interface BookStore {
 
 export const useBookStore = create(
   persist<BookStore>(
-    (set) => ({
+    (set, get) => ({
       books: null,
       status: "idle",
+
       setStatus: (status: StoreStatus) => set({ status }),
       fetchBooks: async ({ page = 1, limit = 5, query = "" }) => {
         try {
@@ -29,7 +31,13 @@ export const useBookStore = create(
           const response = await api.get<BaseResponse<Book>>(
             `/books?page=${page}&limit=${limit}&q=${query}`,
           )
-          set({ books: response, status: "done" })
+          set({
+            books: {
+              ...response,
+              data: response.data.length ? response.data : get().books?.data || [],
+            },
+            status: "done",
+          })
           return response
         } catch (error) {
           set({ status: "fail" })

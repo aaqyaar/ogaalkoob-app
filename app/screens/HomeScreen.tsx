@@ -7,6 +7,7 @@ import { colors, spacing } from "app/theme"
 import { useBookStore } from "app/models/book.store"
 import { useGenreStore } from "app/models/genre.store"
 import { useFocusEffect } from "@react-navigation/native"
+import { useAuthStore } from "app/models"
 
 interface HomeScreenProps extends TabScreenProps<"Home"> {}
 
@@ -15,15 +16,24 @@ export const HomeScreen: FC<HomeScreenProps> = function HomeScreen(_props) {
   const { navigation } = _props
   const { fetchBooks, books, status } = useBookStore()
   const { fetchGenres, genres, status: genreStatus } = useGenreStore()
+  const { getMe, logout } = useAuthStore()
 
   useFocusEffect(
     useCallback(() => {
-      fetchBooks({
-        page: 1,
-        limit: 50,
-      })?.then(() => {
-        fetchGenres()
-      })
+      getMe()
+        ?.then(() => {
+          fetchBooks({
+            page: 1,
+            limit: 5,
+          })?.then(() => {
+            fetchGenres()
+          })
+        })
+        .catch((err) => {
+          if (err.kind === "unauthorized" || err.kind === "forbidden") {
+            logout()
+          }
+        })
     }, []),
   )
 
@@ -38,7 +48,7 @@ export const HomeScreen: FC<HomeScreenProps> = function HomeScreen(_props) {
       preset="auto"
     >
       <View style={flex}>
-        <BooksList status={status} books={books && books?.data.slice(0, 5)} align="horizontal" />
+        <BooksList status={status} books={books && books?.data} align="horizontal" />
       </View>
 
       <GenreList status={genreStatus} genres={genres} />
@@ -61,7 +71,7 @@ export const HomeScreen: FC<HomeScreenProps> = function HomeScreen(_props) {
           />
         </View>
         <View style={flex}>
-          <BooksList status={status} books={books && books.data.slice(5, 10)} align="horizontal" />
+          <BooksList status={status} books={books && books.data} align="horizontal" />
         </View>
       </View>
     </Screen>

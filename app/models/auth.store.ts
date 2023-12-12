@@ -88,7 +88,6 @@ export const useAuthStore = create(
         const data = await api.put<IResetPasswordResponse>(`/auth/password/reset/${userId}`, {
           password,
         })
-        console.log(data)
         set({ status: "done" })
         return data
       },
