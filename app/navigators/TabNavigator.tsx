@@ -2,12 +2,15 @@ import React from "react"
 import * as Screens from "app/screens"
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { colors, typography } from "app/theme"
-import { Platform, TextStyle, ViewStyle } from "react-native"
+import { Platform, TextStyle, View, ViewStyle } from "react-native"
 import { Icon } from "app/components"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { CompositeScreenProps } from "@react-navigation/native"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { RFValue } from "react-native-responsive-fontsize"
+import { useCartStore } from "app/models/cart.store"
+import { Badge } from "@rneui/themed"
 
 export type TabNavigatorParamList = {
   Home: undefined
@@ -37,7 +40,7 @@ export const HomeNavigator = function HomeNavigator() {
         name="BookView"
         options={{
           headerShown: true,
-          headerBackTitle: "",
+          headerBackTitleVisible: false,
           headerTintColor: colors.palette.primary500,
           headerTitleStyle: {
             color: colors.palette.neutral900,
@@ -46,6 +49,21 @@ export const HomeNavigator = function HomeNavigator() {
           navigationBarColor: colors.background,
         }}
         component={Screens.BookViewScreen}
+      />
+
+      <Stack.Screen
+        name="PlayAudio"
+        options={{
+          headerShown: true,
+          headerBackTitleVisible: false,
+          headerTintColor: colors.palette.primary500,
+          headerTitleStyle: {
+            color: colors.palette.neutral900,
+          },
+          // headerShadowVisible: false,
+          navigationBarColor: colors.background,
+        }}
+        component={Screens.PlayAudioScreen}
       />
 
       <Stack.Screen
@@ -62,12 +80,30 @@ export const HomeNavigator = function HomeNavigator() {
         }}
         component={Screens.BookScreen}
       />
+
+      <Stack.Screen
+        name="Checkout"
+        options={{
+          headerShown: true,
+          headerBackTitle: "",
+          headerTintColor: colors.palette.primary500,
+          headerTitleStyle: {
+            color: colors.palette.neutral900,
+          },
+          // headerShadowVisible: false,
+          navigationBarColor: colors.background,
+
+          presentation: "modal",
+        }}
+        component={Screens.CheckoutScreen}
+      />
     </Stack.Navigator>
   )
 }
 
 const TabNavigator = () => {
   const { bottom } = useSafeAreaInsets()
+  const { items } = useCartStore()
 
   return (
     <Tab.Navigator
@@ -129,11 +165,15 @@ const TabNavigator = () => {
         name="Cart"
         options={{
           headerTitleAlign: "center",
-          headerTitle: "Ogaalkoob",
+          headerTitle: "Cart",
           headerTitleStyle: { fontFamily: typography.primary.semiBold },
           tabBarLabelStyle: { fontFamily: typography.primary.normal },
           tabBarIcon: ({ color, focused }) => (
-            <Icon svgIcon="cart" color={focused ? colors.palette.primary500 : color} size={27} />
+            <View style={$badge}>
+              <Icon svgIcon="cart" color={focused ? colors.palette.primary500 : color} size={27} />
+
+              <Badge status="warning" value={items.length} containerStyle={$badgeIcon} />
+            </View>
           ),
         }}
         component={Screens.CartScreen}
@@ -159,7 +199,6 @@ const TabNavigator = () => {
         name="Profile"
         options={{
           headerTitleAlign: "center",
-          headerTitle: "Profile / Settings",
           headerTitleStyle: { fontFamily: typography.primary.semiBold },
           tabBarLabelStyle: { fontFamily: typography.primary.normal },
           tabBarIcon: ({ color, focused }) => (
@@ -181,8 +220,18 @@ const $tabBarItem: ViewStyle = {
 }
 
 const $tabBarLabel: TextStyle = {
-  fontSize: 12,
+  fontSize: RFValue(12),
   fontFamily: typography.primary.medium,
   lineHeight: 16,
   flex: 1,
+}
+
+const $badge: ViewStyle = {
+  position: "relative",
+}
+
+const $badgeIcon: TextStyle = {
+  position: "absolute",
+  top: -4,
+  right: -4,
 }

@@ -42,6 +42,9 @@ export type AppStackParamList = {
   // 🔥
   Book: { bookId: string; bookName: string }
   BookView: { pdfUrl: string; bookName: string }
+
+  Checkout: undefined
+  PlayAudio: { audioUrl: string; bookName: string; bookCover: string }
 }
 
 /**
