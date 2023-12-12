@@ -185,7 +185,7 @@ const $viewPresets = {
     },
   ] as StyleProp<ViewStyle>,
 
-  filled: [$baseViewStyle, { backgroundColor: colors.palette.primary500 }] as StyleProp<ViewStyle>,
+  filled: [$baseViewStyle, { backgroundColor: colors.palette.neutral300 }] as StyleProp<ViewStyle>,
 
   reversed: [
     $baseViewStyle,
@@ -208,7 +208,7 @@ const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
 
 const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
   default: { backgroundColor: colors.palette.primary500 },
-  filled: { backgroundColor: colors.palette.primary500 },
+  filled: { backgroundColor: colors.palette.neutral400 },
   reversed: { backgroundColor: colors.palette.primary500 },
   text: { backgroundColor: "transparent" },
 }
