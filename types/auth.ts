@@ -1,3 +1,5 @@
+import { Purchase } from "types"
+
 enum RoleName {
   ADMIN = "ADMIN",
   SUBSCRIBER = "SUBSCRIBER",
@@ -47,4 +49,6 @@ export interface IResetPasswordResponse {
   message: string
 }
 
-export interface IUser extends User {}
+export interface IUser extends User {
+  purchases: Purchase[]
+}

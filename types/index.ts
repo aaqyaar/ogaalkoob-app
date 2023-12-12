@@ -1,23 +1,29 @@
-enum PurchaseStatus {
+export enum PurchaseStatus {
   PENDING = "PENDING",
   COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
 }
 
 // Enum for Status
-enum Status {
+export enum Status {
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
 }
 
 // Enum for RoleName
-enum RoleName {
+export enum RoleName {
   ADMIN = "ADMIN",
   SUBSCRIBER = "SUBSCRIBER",
 }
 
+export enum PaymentMethod {
+  CARD = "CARD",
+  CASH = "CASH",
+  MMT = "MMT",
+}
+
 // Define the Genre interface
-interface Genre {
+export interface Genre {
   id: string
   name: string
   books: Book[]
@@ -26,7 +32,7 @@ interface Genre {
 }
 
 // Define the Book interface
-interface Book {
+export interface Book {
   id: string
   title: string
   author: string
@@ -37,12 +43,12 @@ interface Book {
   description: string
   genre: Genre[]
 
-  pdfUrl: string
-  audioUrl: string
+  pdfUrl?: string
+  audioUrl?: string
 
-  isDeleted: boolean
-  deletedBy: string | null
-  purchases: Purchase[]
+  isDeleted?: boolean
+  deletedBy?: string | null
+  purchases?: Purchase[]
 
   deletedAt: Date | null
   createdAt: Date
@@ -50,7 +56,7 @@ interface Book {
 }
 
 // Define the Purchase interface
-interface Purchase {
+export interface Purchase {
   id: string
   purchaseDate: Date
   amount: number
@@ -58,12 +64,23 @@ interface Purchase {
   user: User
   books: Book[]
   status: PurchaseStatus
-
+  paymentMethod: PaymentMethod
+  phoneNumber: string
   createdAt: Date
   updatedAt: Date
 }
 
-interface User {
+export interface PurchaseCreationDTO {
+  purchaseDate: string
+  paymentMethod: "CARD" | "CASH" | "MMT"
+  phoneNumber: string
+  amount: number
+  books: Book["id"][]
+  userId: string
+  id?: string
+}
+
+export interface User {
   id: string
   email: string
   password: string
@@ -82,7 +99,7 @@ interface User {
 }
 
 // Define the PasswordReset interface
-interface PasswordReset {
+export interface PasswordReset {
   id: string
   resetCode: string
   resetCodeExpiry: Date
@@ -92,7 +109,7 @@ interface PasswordReset {
 }
 
 // Define the Role interface
-interface Role {
+export interface Role {
   id: string
   name: RoleName
   users: User[]
@@ -101,5 +118,7 @@ interface Role {
   updatedAt: Date
 }
 
-// Export the interfaces
-export { Book, Genre, Purchase, User, PasswordReset, Role, Status, RoleName, PurchaseStatus }
+export interface UploadResult {
+  message: string
+  data: string[]
+}
