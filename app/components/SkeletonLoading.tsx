@@ -2,6 +2,7 @@ import React from "react"
 import SkeletonPlaceholder from "react-native-skeleton-placeholder"
 import { colors, spacing } from "app/theme"
 import { $genreCard } from "./Genre/styles"
+import { Platform } from "react-native"
 
 type SkeletonLoadingType = "book" | "genre" | "bookDetail" | "cover"
 
@@ -23,8 +24,8 @@ export function SkeletonLoading({ type }: { type: SkeletonLoadingType }) {
 function BookSkeletonLoading() {
   return (
     <SkeletonPlaceholder backgroundColor={"#f5f5f5"} highlightColor={colors.palette.neutral50}>
-      <SkeletonPlaceholder.Item width={190}>
-        <SkeletonPlaceholder.Item height={260} borderRadius={13.5} />
+      <SkeletonPlaceholder.Item width={Platform.OS === "ios" ? 190 : 180}>
+        <SkeletonPlaceholder.Item height={260} borderRadius={10} />
 
         <SkeletonPlaceholder.Item
           width={180}
@@ -68,8 +69,8 @@ function GenreSkeletonLoading() {
 function CoverSkeletonLoading() {
   return (
     <SkeletonPlaceholder backgroundColor={"#f5f5f5"} highlightColor={colors.palette.neutral50}>
-      <SkeletonPlaceholder.Item width={190}>
-        <SkeletonPlaceholder.Item height={260} borderRadius={13.5} />
+      <SkeletonPlaceholder.Item width={Platform.OS === "ios" ? 190 : 180}>
+        <SkeletonPlaceholder.Item height={260} borderRadius={10} />
       </SkeletonPlaceholder.Item>
     </SkeletonPlaceholder>
   )
