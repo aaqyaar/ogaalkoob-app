@@ -22,18 +22,6 @@ export const BookViewScreen: FC<BookViewScreenProps> = function BookViewScreen(_
         uri: route.params.pdfUrl,
         cache: true,
       }}
-      onLoadComplete={(numberOfPages) => {
-        console.log(`Number of pages: ${numberOfPages}`)
-      }}
-      onPageChanged={(page) => {
-        console.log(`Current page: ${page}`)
-      }}
-      onError={(error) => {
-        console.log(error)
-      }}
-      onPressLink={(uri) => {
-        console.log(`Link pressed: ${uri}`)
-      }}
       style={$pdfContainer}
     />
   )

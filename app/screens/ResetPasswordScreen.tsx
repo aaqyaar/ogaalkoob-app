@@ -36,7 +36,6 @@ export const ResetPasswordScreen: FC<ResetPasswordScreenProps> = function ResetP
     },
   })
 
-  console.log(errors)
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
 
   const { resetPassword, status, setStatus } = useAuthStore()

@@ -32,7 +32,6 @@ export const ForgotPasswordScreen: FC<ForgotPasswordScreenProps> = function Forg
   const { forgotPassword, status, setStatus } = useAuthStore()
 
   function handleResetPassword(data: z.infer<typeof ForgotPasswordSchema>) {
-    console.log(data)
     forgotPassword(data.email)
       .then((res) => {
         if (res) {

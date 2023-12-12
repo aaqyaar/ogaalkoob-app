@@ -40,13 +40,9 @@ export const BookScreen: FC<BookScreenProps> = function BookScreen(_props) {
     })
 
     if (route.params?.bookId) {
-      fetchBook(route.params?.bookId)
-        .then((book) => {
-          setBook(book)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      fetchBook(route.params?.bookId).then((book) => {
+        setBook(book)
+      })
     }
   }, [route.params?.bookId])
 
