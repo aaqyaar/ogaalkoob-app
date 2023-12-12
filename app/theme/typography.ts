@@ -10,12 +10,26 @@ import {
   Urbanist_700Bold as urbanistBold,
 } from "@expo-google-fonts/urbanist"
 
+import {
+  Inter_300Light as interLight,
+  Inter_400Regular as interRegular,
+  Inter_500Medium as interMedium,
+  Inter_600SemiBold as interSemiBold,
+  Inter_700Bold as interBold,
+} from "@expo-google-fonts/inter"
+
 export const customFontsToLoad = {
   urbanistLight,
   urbanistRegular,
   urbanistMedium,
   urbanistSemiBold,
   urbanistBold,
+
+  interLight,
+  interRegular,
+  interMedium,
+  interSemiBold,
+  interBold,
 }
 
 const fonts = {
@@ -26,6 +40,14 @@ const fonts = {
     medium: "urbanistMedium",
     semiBold: "urbanistSemiBold",
     bold: "urbanistBold",
+  },
+  inter: {
+    // Cross-platform Google font.
+    light: "interLight",
+    normal: "interRegular",
+    medium: "interMedium",
+    semiBold: "interSemiBold",
+    bold: "interBold",
   },
   helveticaNeue: {
     // iOS only font.
@@ -59,6 +81,8 @@ export const typography = {
   /**
    * The primary font. Used in most places.
    */
+  inter: fonts.inter,
+
   primary: fonts.urbanist,
   /**
    * An alternate font used for perhaps titles and stuff.
